@@ -43,8 +43,8 @@ Hey {user}, how are you?
 By the way you can check the [Svelte example](/examples/svelte/), examples for React and Vue are coming soon.
 
 ### TODO
-- [x] Initial page rendering
-- [ ] Partial reloads
+- [X] Initial page rendering
+- [X] Partial reloads
 - [ ] Assets versioning
 - [ ] React and Vue examples
 - [ ] Assets versioning

@@ -6,7 +6,7 @@ use axum::{
     routing::get,
     Router,
 };
-use inertia_axum::{render_with_props, InertiaConfig};
+use inertia_axum::{render, render_with_props, InertiaConfig};
 use serde::Serialize;
 use tower_http::services::ServeDir;
 
@@ -21,6 +21,7 @@ async fn main() {
     let serve_dir = ServeDir::new("client/dist/assets");
     let app = Router::new()
         .route("/", get(root))
+        .route("/counter", get(counter))
         .nest_service("/public", serve_dir)
         .with_state(Arc::new(inertia_config));
 
@@ -32,7 +33,7 @@ async fn root(State(inertia_config): State<Arc<InertiaConfig>>, request: Request
     render_with_props(
         &inertia_config,
         &request,
-        "index".into(),
+        "index",
         RootData {
             user: "pepperoni21".into(),
         },
@@ -42,4 +43,8 @@ async fn root(State(inertia_config): State<Arc<InertiaConfig>>, request: Request
 #[derive(Serialize)]
 struct RootData {
     user: String,
+}
+
+async fn counter(State(inertia_config): State<Arc<InertiaConfig>>, request: Request) -> Response {
+    render(&inertia_config, &request, "counter")
 }
