@@ -1,0 +1,14 @@
+[package]
+name = "example-svelte"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+inertia-axum = { path = "../../" }
+axum = { workspace = true }
+tokio = { workspace = true }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tower-http = { version = "0.5.0", features = ["fs", "trace"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
