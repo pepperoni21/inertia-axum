@@ -47,5 +47,4 @@ By the way you can check the [Svelte example](/examples/svelte/), examples for R
 - [X] Partial reloads
 - [ ] Assets versioning
 - [ ] React and Vue examples
-- [ ] Assets versioning
 - [ ] Shared data
