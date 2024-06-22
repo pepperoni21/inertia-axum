@@ -1,7 +1,13 @@
 use std::sync::Arc;
 
-use axum::{extract::Request, response::Response, routing::get, Extension, Router};
-use inertia_axum::{render, render_with_props, InertiaConfig};
+use axum::{
+    extract::Request,
+    middleware::{from_fn, Next},
+    response::{IntoResponse, Response},
+    routing::get,
+    Extension, Router,
+};
+use inertia_axum::{add_shared_state, InertiaConfig, InertiaRenderer};
 use serde::Serialize;
 use tower_http::services::ServeDir;
 
@@ -18,34 +24,45 @@ async fn main() {
         .route("/", get(root))
         .route("/counter", get(counter))
         .nest_service("/public", serve_dir)
+        .route_layer(from_fn(shared_state_middleware))
         .layer(Extension(Arc::new(inertia_config)));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
 
+async fn shared_state_middleware(mut req: Request, next: Next) -> Response {
+    add_shared_state(
+        &mut req,
+        serde_json::json!({
+            "user": "John Doe"
+        })
+        .as_object()
+        .unwrap()
+        .clone(),
+    );
+    next.run(req).await
+}
+
 async fn root(
     Extension(inertia_config): Extension<Arc<InertiaConfig>>,
     request: Request,
 ) -> Response {
-    render_with_props(
-        &inertia_config,
-        &request,
-        "index",
-        RootData {
-            user: "pepperoni21".into(),
-        },
-    )
+    InertiaRenderer::render("index", &request, &inertia_config)
+        .with_props(RootData {
+            message: "Hey".into(),
+        })
+        .into_response()
 }
 
 #[derive(Serialize)]
 struct RootData {
-    user: String,
+    message: String,
 }
 
 async fn counter(
     Extension(inertia_config): Extension<Arc<InertiaConfig>>,
     request: Request,
 ) -> Response {
-    render(&inertia_config, &request, "counter")
+    InertiaRenderer::render("counter", &request, &inertia_config).into_response()
 }

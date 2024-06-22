@@ -24,28 +24,25 @@ You can then use the render function to render a component:
 ```rust
 #[derive(Serialize)]
 struct RootData {
-    user: String,
+    message: String,
 }
 
 
 async fn root(Extension(app_state): Extension<Arc<AppState>>, request: Request) -> Response {
-    render_with_props(
-        &app_state.inertia_config,
-        &request,
-        "index".into(),
-        RootData {
-            user: "some-user".into(),
-        },
-    )
+    InertiaRenderer::render("index", &request, &inertia_config)
+        .with_props(RootData {
+            message: "Hey".into(),
+        })
+        .into_response()
 }
 ```
 The props will then be available in the component, here's an example with a Svelte component:
 ```js
 <script>
-    export let user
+    export let message
 </script>
 
-Hey {user}, how are you?
+{message}
 ```
 
 By the way you can check the [Svelte example](/examples/svelte/), examples for React and Vue are coming soon.
@@ -56,3 +53,4 @@ By the way you can check the [Svelte example](/examples/svelte/), examples for R
 - [ ] Assets versioning
 - [ ] React and Vue examples
 - [X] Shared data
+- [ ] Support for Vite development server
