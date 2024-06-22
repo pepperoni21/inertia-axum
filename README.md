@@ -12,6 +12,22 @@ struct AppState {
 let inertia_config = InertiaConfig::new("index.html".into());
 ```
 
+Here's how the root template could look like:
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inertia Axum Svelte</title>
+    <script src="public/index.js" defer></script>
+    <link rel="stylesheet" href="public/index.css">
+</head>
+<body>
+    @inertia
+</body>
+</html>
+```
+
 You can then use the render function to render a component:
 ```rust
 #[derive(Serialize)]
