@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct InertiaConfig {
     pub html_path: String,
     pub root_div_id: String,

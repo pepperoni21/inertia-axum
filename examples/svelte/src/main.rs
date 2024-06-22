@@ -1,11 +1,6 @@
 use std::sync::Arc;
 
-use axum::{
-    extract::{Request, State},
-    response::Response,
-    routing::get,
-    Router,
-};
+use axum::{extract::Request, response::Response, routing::get, Extension, Router};
 use inertia_axum::{render, render_with_props, InertiaConfig};
 use serde::Serialize;
 use tower_http::services::ServeDir;
@@ -23,13 +18,16 @@ async fn main() {
         .route("/", get(root))
         .route("/counter", get(counter))
         .nest_service("/public", serve_dir)
-        .with_state(Arc::new(inertia_config));
+        .layer(Extension(Arc::new(inertia_config)));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn root(State(inertia_config): State<Arc<InertiaConfig>>, request: Request) -> Response {
+async fn root(
+    Extension(inertia_config): Extension<Arc<InertiaConfig>>,
+    request: Request,
+) -> Response {
     render_with_props(
         &inertia_config,
         &request,
@@ -45,6 +43,9 @@ struct RootData {
     user: String,
 }
 
-async fn counter(State(inertia_config): State<Arc<InertiaConfig>>, request: Request) -> Response {
+async fn counter(
+    Extension(inertia_config): Extension<Arc<InertiaConfig>>,
+    request: Request,
+) -> Response {
     render(&inertia_config, &request, "counter")
 }

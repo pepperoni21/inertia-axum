@@ -4,7 +4,7 @@ use axum::{
 };
 use serde::Serialize;
 
-use crate::{InertiaConfig, PageObject};
+use crate::{shared_state::SharedState, InertiaConfig, PageObject};
 
 pub fn render_with_props(
     inertia_config: &InertiaConfig,
@@ -14,10 +14,20 @@ pub fn render_with_props(
 ) -> Response {
     let headers = request.headers();
 
-    let serialized_props: serde_json::Value = serde_json::to_value(props).unwrap();
+    let shared_state = request
+        .extensions()
+        .get::<SharedState>()
+        .map(|s| s.clone())
+        .unwrap_or_default();
+
+    let serialized_props: serde_json::Value =
+        serde_json::to_value(props).unwrap_or(serde_json::Value::Null);
+
+    let combined_props = combine_shared_state_with_props(&shared_state, serialized_props);
+
     let page_object = PageObject {
         component: component.to_string(),
-        props: serialized_props,
+        props: combined_props,
         url: request.uri().path().to_string(),
         version: "1".to_string(),
     };
@@ -48,4 +58,15 @@ fn generate_json_page_object_response(page_object: &PageObject) -> Response {
     headers.insert("X-Inertia", "Accept".parse().unwrap());
     headers.insert("X-Inertia", "true".parse().unwrap());
     response
+}
+
+fn combine_shared_state_with_props(
+    shared_state: &SharedState,
+    props: serde_json::Value,
+) -> serde_json::Value {
+    let shared_state = shared_state.0.clone();
+    let mut combined = shared_state.as_object().unwrap().clone();
+    let props = props.as_object().unwrap().clone();
+    combined.extend(props);
+    serde_json::Value::Object(combined)
 }

@@ -2,15 +2,7 @@
 ## A Rust library for interacting with the [Inertia.js](https://inertiajs.com/) protocol in Axum web applications.
 
 ### Usage
-Simply create an `InertiaConfig` instance with the path of the root template (along with other optional fields) that you can add to your application's state.
-
-```rust
-struct AppState {
-    ...
-    inertia_config: InertiaConfig,
-}
-let inertia_config = InertiaConfig::new("index.html".into());
-```
+Simply create an `InertiaConfig` instance with the path of the root template (along with other optional fields) that you can add as an extension.
 
 Here's how the root template could look like:
 ```html
@@ -36,7 +28,7 @@ struct RootData {
 }
 
 
-async fn root(State(app_state): State<Arc<AppState>>, request: Request) -> Response {
+async fn root(Extension(app_state): Extension<Arc<AppState>>, request: Request) -> Response {
     render_with_props(
         &app_state.inertia_config,
         &request,
@@ -63,4 +55,4 @@ By the way you can check the [Svelte example](/examples/svelte/), examples for R
 - [X] Partial reloads
 - [ ] Assets versioning
 - [ ] React and Vue examples
-- [ ] Shared data
+- [X] Shared data
