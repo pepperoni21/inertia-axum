@@ -46,8 +46,7 @@ impl<'a> IntoResponse for InertiaRenderer<'a> {
         let shared_state = self
             .request
             .extensions()
-            .get::<SharedState>()
-            .map(|s| s.clone())
+            .get::<SharedState>().cloned()
             .unwrap_or_default();
 
         let props = self.props.unwrap_or_default();
