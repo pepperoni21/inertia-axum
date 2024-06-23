@@ -46,7 +46,15 @@ impl<'a> IntoResponse for InertiaRenderer<'a> {
         let shared_state = self
             .request
             .extensions()
-            .get::<SharedState>().cloned()
+            .get::<SharedState>()
+            .cloned()
+            .unwrap_or_default();
+
+        let assets_version = self
+            .request
+            .extensions()
+            .get::<crate::AssetsVersion>()
+            .cloned()
             .unwrap_or_default();
 
         let props = self.props.unwrap_or_default();
@@ -56,7 +64,7 @@ impl<'a> IntoResponse for InertiaRenderer<'a> {
             component: self.component,
             props: combined_props,
             url: self.request.uri().path().to_string(),
-            version: "1".to_string(),
+            assets_version: assets_version.to_string(),
         };
         let serialized_page_object = serde_json::to_string(&page_object).unwrap();
 

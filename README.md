@@ -47,10 +47,26 @@ The props will then be available in the component, here's an example with a Svel
 
 By the way you can check the [Svelte example](/examples/svelte/), examples for React and Vue are coming soon.
 
+### Assets versioning
+This library will use the `AssetVersion` extension to add a version to the assets.
+You can then control the version of the assets from your handler or middleware:
+```rust
+async fn assets_versioning_middleware(mut req: Request, next: Next) -> Response {
+    match req.uri().path() {
+        "/counter" => set_assets_version(&mut req, AssetsVersion::String("counter".into())),
+        "/" => set_assets_version(&mut req, AssetsVersion::String("root".into())),
+        _ => {}
+    };
+    next.run(req).await
+}
+```
+The above code will set a different version for the assets for the `/counter` and `/` routes. This way, navigating between these routes will trigger a reload of the assets.
+If no version is specified, the default version will be `AssetsVersion::Number(1)`
+
 ### TODO
 - [X] Initial page rendering
 - [X] Partial reloads
-- [ ] Assets versioning
+- [X] Assets versioning
 - [ ] React and Vue examples
 - [X] Shared data
 - [ ] Support for Vite development server

@@ -6,3 +6,5 @@ mod renderer;
 pub use renderer::*;
 mod shared_state;
 pub use shared_state::*;
+mod assets_version;
+pub use assets_version::*;
