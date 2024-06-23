@@ -35,15 +35,18 @@ async fn main() {
 }
 
 async fn shared_state_middleware(mut req: Request, next: Next) -> Response {
-    add_shared_state(
-        &mut req,
-        serde_json::json!({
-            "user": "John Doe"
-        })
-        .as_object()
-        .unwrap()
-        .clone(),
-    );
+    match req.uri().path() {
+        "/" | "counter" => add_shared_state(
+            &mut req,
+            serde_json::json!({
+                "user": "John Doe"
+            })
+            .as_object()
+            .unwrap()
+            .clone(),
+        ),
+        _ => {}
+    };
     next.run(req).await
 }
 
