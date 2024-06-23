@@ -60,8 +60,25 @@ async fn assets_versioning_middleware(mut req: Request, next: Next) -> Response 
     next.run(req).await
 }
 ```
-The above code will set a different version for the assets for the `/counter` and `/` routes. This way, navigating between these routes will trigger a reload of the assets.
 If no version is specified, the default version will be `AssetsVersion::Number(1)`
+
+### Shared data
+Shared data works similarly to the assets versioning, you can set shared data from your handler or middleware:
+```rust
+async fn shared_state_middleware(mut req: Request, next: Next) -> Response {
+    match req.uri().path() {
+        "/" | "counter" => add_shared_state(
+            &mut req,
+            serde_json::json!({
+                "user": "John Doe"
+            }),
+        ),
+        _ => {}
+    };
+    next.run(req).await
+}
+```
+The above code will make the `user` property available in the index and counter components.
 
 ### TODO
 - [X] Initial page rendering

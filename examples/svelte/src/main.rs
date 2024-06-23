@@ -40,10 +40,7 @@ async fn shared_state_middleware(mut req: Request, next: Next) -> Response {
             &mut req,
             serde_json::json!({
                 "user": "John Doe"
-            })
-            .as_object()
-            .unwrap()
-            .clone(),
+            }),
         ),
         _ => {}
     };
